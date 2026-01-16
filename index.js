@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
 const exams = require('./data/exams');
+const categories = require('./data/categories');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -26,8 +27,24 @@ app.use(express.json());
 app.get('/api/exams', (req, res) => {
     // Implement Caching Headers (Cache for 10 minutes)
     // This tells the browser/CDN to cache this response
+    const { category, q } = req.query;
+    let filtered = exams;
+
+    if (category && category !== 'all') {
+        filtered = filtered.filter(e => e.category === category);
+    }
+
+    if (q) {
+        const lowerQ = q.toLowerCase();
+        filtered = filtered.filter(e =>
+            e.title.toLowerCase().includes(lowerQ) ||
+            e.subtitle.toLowerCase().includes(lowerQ)
+        );
+    }
+
+    // Cache for 10 minutes
     res.set('Cache-Control', 'public, max-age=600');
-    res.json(exams);
+    res.json(filtered);
 });
 
 app.get('/api/exams/:id', (req, res) => {
@@ -39,9 +56,16 @@ app.get('/api/exams/:id', (req, res) => {
     res.json(exam);
 });
 
+// API: Get All Categories
+app.get('/api/categories', (req, res) => {
+    // Cache for 1 hour
+    res.set('Cache-Control', 'public, max-age=3600');
+    res.json(categories);
+});
+
 // Health Check
 app.get('/health', (req, res) => {
-    res.send('GK Prep API is running superfast! 🚀');
+    res.json({ status: 'ok', timestamp: new Date() });
 });
 
 
