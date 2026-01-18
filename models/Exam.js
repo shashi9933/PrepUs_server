@@ -64,13 +64,15 @@ const examSchema = new mongoose.Schema({
         careerGrowth: String
     },
 
-    mockTests: [{
-        id: String,
-        title: String,
-        type: String,
-        questions: Number,
-        time: Number
-    }],
+    mockTests: [
+        new mongoose.Schema({
+            id: String,
+            title: String,
+            type: String, // 'Free' or 'Premium'
+            questions: Number,
+            time: Number
+        }, { _id: false })
+    ],
 
     faqs: [{
         question: String,
