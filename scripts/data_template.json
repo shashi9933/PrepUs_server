@@ -1,0 +1,34 @@
+[
+    {
+        "exam": "sbi-po",
+        "subject": "Quantitative Aptitude",
+        "topic": "Data Interpretation",
+        "difficulty": "Hard",
+        "questionText": "What is the ratio of...?",
+        "options": [
+            "1:2",
+            "2:3",
+            "3:4",
+            "4:5"
+        ],
+        "correctIndex": 1,
+        "explanation": "To solve this, we first calculate...",
+        "source": "PYQ"
+    },
+    {
+        "exam": "upsc-cse",
+        "subject": "History",
+        "topic": "Modern India",
+        "difficulty": "Medium",
+        "questionText": "Who was the Viceroy during...?",
+        "options": [
+            "Curzon",
+            "Irwin",
+            "Mountbatten",
+            "Canning"
+        ],
+        "correctIndex": 0,
+        "explanation": "Lord Curzon partitioned Bengal in 1905...",
+        "source": "Static"
+    }
+]

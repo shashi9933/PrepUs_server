@@ -1,0 +1,642 @@
+[
+    {
+        "exam": "sbi-po",
+        "subject": "General Awareness",
+        "topic": "Banking Awareness",
+        "difficulty": "Easy",
+        "questionText": "Which institution regulates scheduled commercial banks in India?",
+        "options": [
+            "Ministry of Finance",
+            "Reserve Bank of India",
+            "SEBI",
+            "NABARD"
+        ],
+        "correctIndex": 1,
+        "explanation": "The Reserve Bank of India (RBI) is the central bank and primary regulator of scheduled commercial banks in India.",
+        "source": "Static"
+    },
+    {
+        "exam": "sbi-po",
+        "subject": "General Awareness",
+        "topic": "Economy",
+        "difficulty": "Medium",
+        "questionText": "What does the term 'repo rate' refer to?",
+        "options": [
+            "Rate at which banks lend to RBI",
+            "Rate at which RBI lends to banks",
+            "Interest rate on savings accounts",
+            "Interest rate on fixed deposits"
+        ],
+        "correctIndex": 1,
+        "explanation": "Repo rate is the rate at which RBI lends short-term funds to commercial banks against government securities.",
+        "source": "Static"
+    },
+    {
+        "exam": "sbi-po",
+        "subject": "General Awareness",
+        "topic": "Current Affairs",
+        "difficulty": "Medium",
+        "questionText": "Which Indian bank launched the digital lending platform 'YONO Business'?",
+        "options": [
+            "Punjab National Bank",
+            "HDFC Bank",
+            "State Bank of India",
+            "ICICI Bank"
+        ],
+        "correctIndex": 2,
+        "explanation": "YONO Business is a digital banking platform launched by the State Bank of India to cater to MSMEs and corporate customers.",
+        "source": "Current Affairs"
+    },
+    {
+        "exam": "sbi-po",
+        "subject": "General Awareness",
+        "topic": "Banking Awareness",
+        "difficulty": "Easy",
+        "questionText": "Which of the following accounts earns the highest interest rate generally?",
+        "options": [
+            "Savings Account",
+            "Current Account",
+            "Fixed Deposit",
+            "Recurring Deposit"
+        ],
+        "correctIndex": 2,
+        "explanation": "Fixed deposits generally offer higher interest rates compared to savings, current, and recurring deposit accounts.",
+        "source": "Static"
+    },
+    {
+        "exam": "sbi-po",
+        "subject": "General Awareness",
+        "topic": "Financial Institutions",
+        "difficulty": "Medium",
+        "questionText": "NABARD primarily focuses on the development of which sector?",
+        "options": [
+            "Industrial sector",
+            "Agricultural and rural sector",
+            "Urban infrastructure",
+            "Capital markets"
+        ],
+        "correctIndex": 1,
+        "explanation": "NABARD (National Bank for Agriculture and Rural Development) focuses on agricultural credit and rural development.",
+        "source": "Static"
+    },
+    {
+        "exam": "sbi-po",
+        "subject": "General Knowledge",
+        "topic": "Indian Economy",
+        "difficulty": "Medium",
+        "questionText": "Which committee recommended the establishment of the Monetary Policy Committee (MPC) in India?",
+        "options": [
+            "Narasimham Committee",
+            "Urjit Patel Committee",
+            "Raghuram Rajan Committee",
+            "Kelkar Committee"
+        ],
+        "correctIndex": 1,
+        "explanation": "The Urjit Patel Committee recommended the establishment of the Monetary Policy Committee to decide policy rates.",
+        "source": "Static"
+    },
+    {
+        "exam": "sbi-po",
+        "subject": "General Awareness",
+        "topic": "Current Affairs",
+        "difficulty": "Hard",
+        "questionText": "Which organization publishes the 'Financial Stability Report' in India?",
+        "options": [
+            "SEBI",
+            "Ministry of Finance",
+            "Reserve Bank of India",
+            "NITI Aayog"
+        ],
+        "correctIndex": 2,
+        "explanation": "The Financial Stability Report is published by the RBI to assess risks to the financial system.",
+        "source": "Current Affairs"
+    },
+    {
+        "exam": "sbi-po",
+        "subject": "General Knowledge",
+        "topic": "Static GK",
+        "difficulty": "Easy",
+        "questionText": "What is the headquarters of the State Bank of India?",
+        "options": [
+            "New Delhi",
+            "Kolkata",
+            "Mumbai",
+            "Chennai"
+        ],
+        "correctIndex": 2,
+        "explanation": "The headquarters of the State Bank of India is located in Mumbai, Maharashtra.",
+        "source": "Static"
+    },
+    {
+        "exam": "sbi-po",
+        "subject": "General Awareness",
+        "topic": "Banking Awareness",
+        "difficulty": "Medium",
+        "questionText": "Which of the following is NOT a function of commercial banks?",
+        "options": [
+            "Accepting deposits",
+            "Issuing currency notes",
+            "Providing loans",
+            "Facilitating remittances"
+        ],
+        "correctIndex": 1,
+        "explanation": "Issuing currency notes is the function of the Reserve Bank of India, not commercial banks.",
+        "source": "Static"
+    },
+    {
+        "exam": "sbi-po",
+        "subject": "General Awareness",
+        "topic": "Economy",
+        "difficulty": "Hard",
+        "questionText": "What does CRR stand for in the Indian banking system?",
+        "options": [
+            "Credit Reserve Ratio",
+            "Cash Reserve Ratio",
+            "Capital Risk Ratio",
+            "Credit Risk Reserve"
+        ],
+        "correctIndex": 1,
+        "explanation": "CRR (Cash Reserve Ratio) is the percentage of deposits that banks must maintain with the RBI in cash form.",
+        "source": "Static"
+    },
+    {
+        "exam": "sbi-po",
+        "subject": "General Awareness",
+        "topic": "Banking Awareness",
+        "difficulty": "Easy",
+        "questionText": "Which type of account is mainly opened for business transactions?",
+        "options": [
+            "Savings Account",
+            "Current Account",
+            "Fixed Deposit",
+            "Recurring Deposit"
+        ],
+        "correctIndex": 1,
+        "explanation": "Current accounts are mainly used by businesses for frequent and large transactions.",
+        "source": "Static"
+    },
+    {
+        "exam": "sbi-po",
+        "subject": "General Awareness",
+        "topic": "Economy",
+        "difficulty": "Medium",
+        "questionText": "GDP deflator is used to measure which of the following?",
+        "options": [
+            "Inflation",
+            "Unemployment",
+            "Fiscal deficit",
+            "Trade deficit"
+        ],
+        "correctIndex": 0,
+        "explanation": "GDP deflator measures inflation by reflecting price changes in all domestically produced goods and services.",
+        "source": "Static"
+    },
+    {
+        "exam": "sbi-po",
+        "subject": "General Awareness",
+        "topic": "Current Affairs",
+        "difficulty": "Medium",
+        "questionText": "Which Indian bank launched the 'Video KYC' facility first?",
+        "options": [
+            "ICICI Bank",
+            "HDFC Bank",
+            "State Bank of India",
+            "Axis Bank"
+        ],
+        "correctIndex": 2,
+        "explanation": "State Bank of India was among the first public sector banks to launch Video KYC.",
+        "source": "Current Affairs"
+    },
+    {
+        "exam": "sbi-po",
+        "subject": "General Knowledge",
+        "topic": "Static GK",
+        "difficulty": "Easy",
+        "questionText": "Which Indian state has the maximum number of public sector banks' headquarters?",
+        "options": [
+            "Maharashtra",
+            "Tamil Nadu",
+            "West Bengal",
+            "Karnataka"
+        ],
+        "correctIndex": 2,
+        "explanation": "Kolkata, West Bengal, historically hosts the headquarters of many public sector banks.",
+        "source": "Static"
+    },
+    {
+        "exam": "sbi-po",
+        "subject": "General Awareness",
+        "topic": "Banking Awareness",
+        "difficulty": "Medium",
+        "questionText": "What is the minimum reserve requirement that banks must maintain with RBI called?",
+        "options": [
+            "SLR",
+            "CRR",
+            "PLR",
+            "Bank Rate"
+        ],
+        "correctIndex": 1,
+        "explanation": "CRR (Cash Reserve Ratio) is the minimum cash reserve banks must maintain with RBI.",
+        "source": "Static"
+    },
+    {
+        "exam": "sbi-po",
+        "subject": "General Awareness",
+        "topic": "Economy",
+        "difficulty": "Hard",
+        "questionText": "Which index measures the performance of the manufacturing sector in India?",
+        "options": [
+            "IIP",
+            "CPI",
+            "WPI",
+            "PMI"
+        ],
+        "correctIndex": 3,
+        "explanation": "Purchasing Managers’ Index (PMI) reflects the performance of the manufacturing sector.",
+        "source": "Current Affairs"
+    },
+    {
+        "exam": "sbi-po",
+        "subject": "General Awareness",
+        "topic": "Current Affairs",
+        "difficulty": "Medium",
+        "questionText": "Who is the current Chairperson of the State Bank of India (as of recent notification)?",
+        "options": [
+            "Dinesh Kumar Khara",
+            "Arundhati Bhattacharya",
+            "Shaktikanta Das",
+            "Rajnish Kumar"
+        ],
+        "correctIndex": 0,
+        "explanation": "Dinesh Kumar Khara is the Chairperson of SBI as per recent notifications.",
+        "source": "Current Affairs"
+    },
+    {
+        "exam": "sbi-po",
+        "subject": "General Knowledge",
+        "topic": "Static GK",
+        "difficulty": "Easy",
+        "questionText": "What is the full form of IFSC used in banking?",
+        "options": [
+            "Indian Financial System Code",
+            "International Financial System Code",
+            "Indian Fund Settlement Code",
+            "Integrated Financial System Code"
+        ],
+        "correctIndex": 0,
+        "explanation": "IFSC stands for Indian Financial System Code and is used to identify bank branches.",
+        "source": "Static"
+    },
+    {
+        "exam": "sbi-po",
+        "subject": "General Awareness",
+        "topic": "Banking Awareness",
+        "difficulty": "Medium",
+        "questionText": "Which of the following is known as plastic money?",
+        "options": [
+            "Debit Card",
+            "Credit Card",
+            "Smart Card",
+            "All of the above"
+        ],
+        "correctIndex": 3,
+        "explanation": "Debit cards, credit cards, and smart cards are collectively known as plastic money.",
+        "source": "Static"
+    },
+    {
+        "exam": "sbi-po",
+        "subject": "General Awareness",
+        "topic": "Economy",
+        "difficulty": "Medium",
+        "questionText": "Fiscal deficit occurs when government expenditure exceeds which of the following?",
+        "options": [
+            "Revenue receipts",
+            "Capital receipts",
+            "Total receipts excluding borrowings",
+            "Tax revenue"
+        ],
+        "correctIndex": 2,
+        "explanation": "Fiscal deficit occurs when total expenditure exceeds total receipts excluding borrowings.",
+        "source": "Static"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Awareness",
+        "topic": "Banking Awareness",
+        "difficulty": "Easy",
+        "questionText": "Which organization conducts the IBPS PO examination?",
+        "options": [
+            "RBI",
+            "SBI",
+            "Institute of Banking Personnel Selection",
+            "Ministry of Finance"
+        ],
+        "correctIndex": 2,
+        "explanation": "IBPS PO examination is conducted by the Institute of Banking Personnel Selection.",
+        "source": "Static"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Awareness",
+        "topic": "Economy",
+        "difficulty": "Easy",
+        "questionText": "What does GDP stand for?",
+        "options": [
+            "Gross Domestic Product",
+            "General Development Plan",
+            "Gross Demand Price",
+            "Government Domestic Product"
+        ],
+        "correctIndex": 0,
+        "explanation": "GDP stands for Gross Domestic Product, measuring total economic output.",
+        "source": "Static"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Awareness",
+        "topic": "Banking Awareness",
+        "difficulty": "Medium",
+        "questionText": "Which institution acts as the banker to the Government of India?",
+        "options": [
+            "SBI",
+            "RBI",
+            "NABARD",
+            "SEBI"
+        ],
+        "correctIndex": 1,
+        "explanation": "The Reserve Bank of India acts as the banker, advisor, and agent to the Government of India.",
+        "source": "Static"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Awareness",
+        "topic": "Current Affairs",
+        "difficulty": "Medium",
+        "questionText": "Which bank launched the digital payments platform 'iMobile Pay'?",
+        "options": [
+            "Axis Bank",
+            "HDFC Bank",
+            "ICICI Bank",
+            "PNB"
+        ],
+        "correctIndex": 2,
+        "explanation": "ICICI Bank launched iMobile Pay to allow payments even for non-customers.",
+        "source": "Current Affairs"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Knowledge",
+        "topic": "Static GK",
+        "difficulty": "Easy",
+        "questionText": "Which city is known as the financial capital of India?",
+        "options": [
+            "Delhi",
+            "Mumbai",
+            "Kolkata",
+            "Chennai"
+        ],
+        "correctIndex": 1,
+        "explanation": "Mumbai is the financial capital of India, hosting RBI, BSE, and NSE.",
+        "source": "Static"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Awareness",
+        "topic": "Economy",
+        "difficulty": "Medium",
+        "questionText": "Inflation refers to a sustained rise in which of the following?",
+        "options": [
+            "Employment",
+            "Price level",
+            "Production",
+            "Income"
+        ],
+        "correctIndex": 1,
+        "explanation": "Inflation is the sustained increase in the general price level of goods and services.",
+        "source": "Static"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Awareness",
+        "topic": "Banking Awareness",
+        "difficulty": "Easy",
+        "questionText": "Which type of deposit account does not earn interest?",
+        "options": [
+            "Savings Account",
+            "Current Account",
+            "Fixed Deposit",
+            "Recurring Deposit"
+        ],
+        "correctIndex": 1,
+        "explanation": "Current accounts generally do not earn interest.",
+        "source": "Static"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Awareness",
+        "topic": "Current Affairs",
+        "difficulty": "Medium",
+        "questionText": "Which public sector bank merged with Oriental Bank of Commerce and United Bank of India?",
+        "options": [
+            "Canara Bank",
+            "Union Bank of India",
+            "Punjab National Bank",
+            "Indian Bank"
+        ],
+        "correctIndex": 2,
+        "explanation": "Punjab National Bank absorbed OBC and United Bank of India.",
+        "source": "Current Affairs"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Knowledge",
+        "topic": "Indian Economy",
+        "difficulty": "Medium",
+        "questionText": "Which sector contributes the highest share to India's GDP?",
+        "options": [
+            "Agriculture",
+            "Industry",
+            "Services",
+            "Mining"
+        ],
+        "correctIndex": 2,
+        "explanation": "The services sector contributes the highest share to India's GDP.",
+        "source": "Static"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Awareness",
+        "topic": "Banking Awareness",
+        "difficulty": "Hard",
+        "questionText": "Which committee is associated with banking sector reforms in India?",
+        "options": [
+            "Narasimham Committee",
+            "Kelkar Committee",
+            "Urjit Patel Committee",
+            "Shivraj Patil Committee"
+        ],
+        "correctIndex": 0,
+        "explanation": "The Narasimham Committee played a major role in banking sector reforms.",
+        "source": "Static"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Awareness",
+        "topic": "Economy",
+        "difficulty": "Medium",
+        "questionText": "Fiscal deficit is the excess of government expenditure over which of the following?",
+        "options": [
+            "Revenue receipts",
+            "Capital receipts",
+            "Total receipts excluding borrowings",
+            "Tax revenue"
+        ],
+        "correctIndex": 2,
+        "explanation": "Fiscal deficit is total expenditure minus total receipts excluding borrowings.",
+        "source": "Static"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Awareness",
+        "topic": "Banking Awareness",
+        "difficulty": "Easy",
+        "questionText": "What does IFSC stand for?",
+        "options": [
+            "Indian Financial System Code",
+            "International Finance System Code",
+            "Indian Fund Settlement Code",
+            "Integrated Finance Service Code"
+        ],
+        "correctIndex": 0,
+        "explanation": "IFSC stands for Indian Financial System Code.",
+        "source": "Static"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Awareness",
+        "topic": "Current Affairs",
+        "difficulty": "Hard",
+        "questionText": "Which organization publishes the Financial Stability Report in India?",
+        "options": [
+            "SEBI",
+            "Ministry of Finance",
+            "RBI",
+            "NITI Aayog"
+        ],
+        "correctIndex": 2,
+        "explanation": "The Reserve Bank of India publishes the Financial Stability Report.",
+        "source": "Current Affairs"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Knowledge",
+        "topic": "Static GK",
+        "difficulty": "Easy",
+        "questionText": "Which river is known as the 'Ganga of the South'?",
+        "options": [
+            "Krishna",
+            "Godavari",
+            "Kaveri",
+            "Tungabhadra"
+        ],
+        "correctIndex": 2,
+        "explanation": "River Kaveri is known as the Ganga of the South.",
+        "source": "Static"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Awareness",
+        "topic": "Banking Awareness",
+        "difficulty": "Medium",
+        "questionText": "Which banking term refers to money deposited for a fixed period at a fixed rate of interest?",
+        "options": [
+            "Savings Deposit",
+            "Current Deposit",
+            "Fixed Deposit",
+            "Demand Deposit"
+        ],
+        "correctIndex": 2,
+        "explanation": "Fixed Deposits are deposited for a fixed period at a fixed interest rate.",
+        "source": "Static"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Awareness",
+        "topic": "Economy",
+        "difficulty": "Hard",
+        "questionText": "Which index measures inflation at the consumer level?",
+        "options": [
+            "WPI",
+            "GDP Deflator",
+            "CPI",
+            "IIP"
+        ],
+        "correctIndex": 2,
+        "explanation": "Consumer Price Index (CPI) measures retail inflation.",
+        "source": "Static"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Knowledge",
+        "topic": "Static GK",
+        "difficulty": "Easy",
+        "questionText": "Who is known as the father of Indian banking?",
+        "options": [
+            "Raghuram Rajan",
+            "RBI",
+            "Sir Osborne Smith",
+            "Sir Sorabji Pochkhanawala"
+        ],
+        "correctIndex": 3,
+        "explanation": "Sir Sorabji Pochkhanawala is known as the father of Indian banking.",
+        "source": "Static"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Awareness",
+        "topic": "Current Affairs",
+        "difficulty": "Medium",
+        "questionText": "Which Indian bank launched the digital savings account 'Video KYC' facility?",
+        "options": [
+            "SBI",
+            "Axis Bank",
+            "PNB",
+            "Bank of Baroda"
+        ],
+        "correctIndex": 0,
+        "explanation": "SBI launched Video KYC to enable paperless account opening.",
+        "source": "Current Affairs"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Awareness",
+        "topic": "Banking Awareness",
+        "difficulty": "Medium",
+        "questionText": "What is the full form of NPA in banking?",
+        "options": [
+            "Non Performing Asset",
+            "Net Productive Asset",
+            "New Payment Account",
+            "National Public Asset"
+        ],
+        "correctIndex": 0,
+        "explanation": "NPA stands for Non Performing Asset, where loan repayment stops.",
+        "source": "Static"
+    },
+    {
+        "exam": "ibps-po",
+        "subject": "General Awareness",
+        "topic": "Economy",
+        "difficulty": "Hard",
+        "questionText": "Which body is responsible for monetary policy decisions in India?",
+        "options": [
+            "RBI Governor",
+            "Ministry of Finance",
+            "Monetary Policy Committee",
+            "SEBI"
+        ],
+        "correctIndex": 2,
+        "explanation": "Monetary Policy Committee (MPC) decides policy rates in India.",
+        "source": "Static"
+    }
+]

@@ -1,10 +1,17 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String }, // Optional if using OAuth
+    name: { type: String }, // Optional initially
+    email: { type: String, unique: true, sparse: true }, // Sparse: Allows specific null/duplicates if needed, but uniqueness matters for non-null
+    phone: { type: String, unique: true, sparse: true }, // Main identifier for OTP
+    password: { type: String },
     googleId: String,
+
+    // Auth specific
+    otp: { type: String },
+    otpExpires: { type: Date },
+    isProfileComplete: { type: Boolean, default: false },
+
     avatar: String,
 
     // Progress & Gameification

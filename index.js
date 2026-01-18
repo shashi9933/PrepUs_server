@@ -49,6 +49,9 @@ app.use('/api/admin', adminRoutes);
 
 // Test Routes
 app.use('/api/tests', testRoutes);
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/analytics', require('./routes/analytics'));
+
 
 // API Routes
 app.get('/api/exams', (req, res) => {
