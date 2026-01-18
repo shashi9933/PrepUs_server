@@ -3,7 +3,8 @@ const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
 const mongoose = require('mongoose');
-const exams = require('./data/exams');
+// const exams = require('./data/exams'); // Deprecated: Moved to DB
+const Exam = require('./models/Exam');
 const categories = require('./data/categories');
 const adminRoutes = require('./routes/admin');
 const testRoutes = require('./routes/tests');
@@ -71,36 +72,46 @@ app.use('/api/analytics', require('./routes/analytics'));
 
 
 // API Routes
-app.get('/api/exams', (req, res) => {
+app.get('/api/exams', async (req, res) => {
     // Implement Caching Headers (Cache for 10 minutes)
-    // This tells the browser/CDN to cache this response
-    const { category, q } = req.query;
-    let filtered = exams;
+    try {
+        const { category, q } = req.query;
+        let query = {};
 
-    if (category && category !== 'all') {
-        filtered = filtered.filter(e => e.category === category);
+        if (category && category !== 'all') {
+            query.category = category;
+        }
+
+        if (q) {
+            query.$or = [
+                { title: { $regex: q, $options: 'i' } },
+                { subtitle: { $regex: q, $options: 'i' } }
+            ];
+        }
+
+        const exams = await Exam.find(query).lean();
+
+        // Cache for 10 minutes
+        res.set('Cache-Control', 'public, max-age=600');
+        res.json(exams);
+    } catch (err) {
+        console.error('Fetch Exams Error:', err);
+        res.status(500).json({ error: 'Failed to fetch exams' });
     }
-
-    if (q) {
-        const lowerQ = q.toLowerCase();
-        filtered = filtered.filter(e =>
-            e.title.toLowerCase().includes(lowerQ) ||
-            e.subtitle.toLowerCase().includes(lowerQ)
-        );
-    }
-
-    // Cache for 10 minutes
-    res.set('Cache-Control', 'public, max-age=600');
-    res.json(filtered);
 });
 
-app.get('/api/exams/:id', (req, res) => {
-    const exam = exams.find(e => e.id === req.params.id);
-    if (!exam) return res.status(404).json({ message: 'Exam not found' });
+app.get('/api/exams/:id', async (req, res) => {
+    try {
+        const exam = await Exam.findOne({ id: req.params.id }).lean();
+        if (!exam) return res.status(404).json({ message: 'Exam not found' });
 
-    // Cache individual exam for 1 hour
-    res.set('Cache-Control', 'public, max-age=3600');
-    res.json(exam);
+        // Cache individual exam for 1 hour
+        res.set('Cache-Control', 'public, max-age=3600');
+        res.json(exam);
+    } catch (err) {
+        console.error('Fetch Exam Detail Error:', err);
+        res.status(500).json({ error: 'Failed to fetch exam details' });
+    }
 });
 
 // API: Get All Categories
