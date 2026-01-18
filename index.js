@@ -1,11 +1,33 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const compression = require('compression');
+const mongoose = require('mongoose');
 const exams = require('./data/exams');
 const categories = require('./data/categories');
+const adminRoutes = require('./routes/admin');
+const testRoutes = require('./routes/tests');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Automation: Cron Job
+const cron = require('node-cron');
+const { runDailyScheduler } = require('./utils/dailyScheduler');
+
+// Schedule: Run every 10 minutes (For Demo/Dev)
+// In Prod: '0 0 * * *' (Midnight)
+cron.schedule('*/10 * * * *', () => {
+    runDailyScheduler();
+});
+
+// Run once on startup for dev convenience (Optional)
+// runDailyScheduler(); 
+
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => console.log('✅ MongoDB Connected'))
+    .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
 // Middleware for Speed & Security
 app.use(compression()); // Compress responses (gzip)
@@ -21,7 +43,12 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 
+// Routes
+// Admin Routes
+app.use('/api/admin', adminRoutes);
 
+// Test Routes
+app.use('/api/tests', testRoutes);
 
 // API Routes
 app.get('/api/exams', (req, res) => {
