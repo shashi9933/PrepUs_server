@@ -45,7 +45,7 @@ router.post('/submit', verifyToken, async (req, res) => {
     try {
         // Use authenticated user ID if available, fallback to provided userId
         const finalUserId = req.user?.id || userId;
-        
+
         // 1. Fetch full questions to check answers
         const questionIds = responses.map(r => r.questionId);
         const dbQuestions = await Question.find({ _id: { $in: questionIds } });
@@ -130,7 +130,12 @@ router.post('/generate', async (req, res) => {
         res.json({ testId: test._id, title: test.title, count: test.questions.length });
     } catch (err) {
         console.error('Generate Test Error:', err);
-        res.status(500).json({ error: 'Failed to generate test', details: err.message });
+        const statusCode = err.message.includes('No questions found') ? 404 : 500;
+        res.status(statusCode).json({
+            error: 'Failed to generate test',
+            details: err.message,
+            code: statusCode === 404 ? 'NO_QUESTIONS' : 'INTERNAL_ERROR'
+        });
     }
 });
 

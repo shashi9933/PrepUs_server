@@ -47,10 +47,10 @@ const corsOptions = {
     optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
-app.use((req, res, next) => {
-    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
-    next();
-});
+// app.use((req, res, next) => {
+//    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+//    next();
+// });
 
 app.use(express.json());
 
