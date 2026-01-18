@@ -1,24 +1,16 @@
 const DailyTest = require('../models/DailyTest');
 const Question = require('../models/Question');
+const { getRandomQuestions } = require('./examDatabaseManager');
 
 /**
  * Creates a new test (Daily or Practice)
+ * Fetches questions from pre-indexed database
  */
 async function createTest({ examId, date, type = 'daily', topic = 'General', count = 10 }) {
     console.log(`⚡ Generating ${type} Test for ${examId} (${topic})...`);
 
     try {
-        // Strategy: Pick random questions for this exam
-        const matchStage = { exam: examId };
-        if (topic !== 'General' && type === 'practice') {
-            // Simple regex matching for topic if provided (or exact match)
-            matchStage.$or = [
-                { subject: { $regex: topic, $options: 'i' } },
-                { topic: { $regex: topic, $options: 'i' } }
-            ];
-        }
-
-        // Check how many questions exist first
+        // Check how many questions exist first using indexed query
         const totalQuestions = await Question.countDocuments({ exam: examId });
         console.log(`   Found ${totalQuestions} questions for exam ${examId}`);
 
@@ -26,10 +18,12 @@ async function createTest({ examId, date, type = 'daily', topic = 'General', cou
             throw new Error(`❌ No questions found in database for exam: ${examId}. Please seed the database first.`);
         }
 
-        const questions = await Question.aggregate([
-            { $match: matchStage },
-            { $sample: { size: Math.min(count, totalQuestions) } }
-        ]);
+        // Fetch random questions using optimized aggregation with compound indexes
+        const questions = await getRandomQuestions({
+            examId,
+            topic: topic !== 'General' ? topic : null,
+            count: Math.min(count, totalQuestions)
+        });
 
         if (questions.length === 0) {
             // Fallback: Try without topic constraint if specific topic failed
@@ -75,29 +69,41 @@ async function createTest({ examId, date, type = 'daily', topic = 'General', cou
 
 /**
  * Generates or retrieves the Daily Test for a specific Exam.
+ * FETCHES FROM DATABASE if exists, only generates once per day.
  * Uses MongoDB upsert to handle race conditions safely.
  */
 async function getOrCreateDailyTest(examId, date) {
     try {
         const dateStr = date || new Date().toISOString().split('T')[0];
         
-        // Strategy: Use findOneAndUpdate with upsert to avoid race conditions
-        // This is atomic at the database level
-        
         console.log(`📝 Loading daily test for ${examId} on ${dateStr}...`);
 
-        // First, generate the questions we want to use
-        const matchStage = { exam: examId };
+        // Step 1: Check if test already exists (FETCH FROM DB)
+        // Note: We don't filter by type since all our daily tests should be type 'daily'
+        const existingTest = await DailyTest.findOne({
+            examId,
+            date: dateStr
+        }).populate('questions');
+
+        if (existingTest && existingTest.questions && existingTest.questions.length > 0) {
+            console.log(`✅ Daily test already exists (fetched from DB) - ${existingTest.questions.length} questions`);
+            return existingTest;
+        }
+
+        // Step 2: If not exists, generate it (only once per day)
+        console.log(`⏳ Test doesn't exist. Generating questions...`);
+        
         const totalQuestions = await Question.countDocuments({ exam: examId });
         
         if (totalQuestions === 0) {
             throw new Error(`No questions found for exam: ${examId}`);
         }
 
-        const questions = await Question.aggregate([
-            { $match: matchStage },
-            { $sample: { size: Math.min(10, totalQuestions) } }
-        ]);
+        // Fetch random questions using optimized method
+        const questions = await getRandomQuestions({
+            examId,
+            count: Math.min(10, totalQuestions)
+        });
 
         if (questions.length === 0) {
             throw new Error(`Failed to select questions for exam: ${examId}`);
@@ -106,37 +112,23 @@ async function getOrCreateDailyTest(examId, date) {
         const questionIds = questions.map(q => q._id);
         console.log(`   ✅ Selected ${questions.length} random questions`);
 
-        // Now use findOneAndUpdate with upsert to create or return existing
-        const result = await DailyTest.findOneAndUpdate(
-            { 
-                examId, 
-                date: dateStr, 
-                type: 'daily' 
-            },
-            {
-                $setOnInsert: {
-                    examId,
-                    date: dateStr,
-                    type: 'daily',
-                    topic: 'General',
-                    title: `Daily Drill - ${dateStr}`,
-                    questions: questionIds,
-                    isPublished: true,
-                    createdAt: new Date()
-                }
-            },
-            { 
-                upsert: true, 
-                new: true 
-            }
-        ).populate('questions');
+        // Step 3: Save to database
+        const newTest = new DailyTest({
+            examId,
+            date: dateStr,
+            type: 'daily',
+            topic: 'General',
+            title: `Daily Drill - ${dateStr}`,
+            questions: questionIds,
+            isPublished: true
+        });
 
-        if (result) {
-            console.log(`✅ Daily test loaded for ${examId} (${result.questions.length} questions)`);
-            return result;
-        }
+        await newTest.save();
+        const populatedTest = await DailyTest.findById(newTest._id).populate('questions');
+        
+        console.log(`✅ Daily test GENERATED & SAVED to DB - ${populatedTest.questions.length} questions`);
+        return populatedTest;
 
-        throw new Error('Unexpected: upsert returned null');
     } catch (err) {
         console.error(`❌ Failed to get/create daily test for ${examId}:`, err.message);
         throw new Error(`Failed to load daily test for ${examId}`);

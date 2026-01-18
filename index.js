@@ -25,17 +25,22 @@ cron.schedule('*/10 * * * *', () => {
 // runDailyScheduler(); 
 
 // Connect to MongoDB
+const { ensureIndexes } = require('./utils/examDatabaseManager');
+
 mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log('✅ MongoDB Connected'))
+    .then(async () => {
+        console.log('✅ MongoDB Connected');
+        // Create performance indexes on startup
+        await ensureIndexes();
+    })
     .catch(err => console.error('❌ MongoDB Connection Error:', err));
 
 // Middleware for Speed & Security
 app.use(compression()); // Compress responses (gzip)
 
-// CORS Configuration
-// Allow requests from Vercel Frontend
+// CORS Configuration - MUST set CLIENT_URL in production
 const corsOptions = {
-    origin: process.env.CLIENT_URL || '*', // Set CLIENT_URL in Render to your Vercel URL
+    origin: process.env.CLIENT_URL || 'http://localhost:5173', // Vite default dev port
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true, // Allow credentials (cookies, tokens)
@@ -113,6 +118,18 @@ app.get('/health', (req, res) => {
 
 
 // Start Server
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+const server = app.listen(PORT, async () => {
+    console.log(`✅ Server LISTENING on port ${PORT}`);
+});
+
+server.on('error', (err) => {
+    console.error('❌ Server error:', err);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+    console.error('❌ Unhandled Rejection at:', promise, 'reason:', reason);
+});
+
+process.on('uncaughtException', (err) => {
+    console.error('❌ Uncaught Exception:', err);
 });
