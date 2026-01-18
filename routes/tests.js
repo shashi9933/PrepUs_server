@@ -20,6 +20,21 @@ router.get('/daily/:examId', async (req, res) => {
     }
 });
 
+// GET /api/tests/:testId
+// Fetch a specific test by ID (for practice/generated tests)
+router.get('/:testId', async (req, res) => {
+    try {
+        const DailyTest = require('../models/DailyTest');
+        const test = await DailyTest.findById(req.params.testId).populate('questions');
+        if (!test) return res.status(404).json({ error: 'Test not found' });
+        res.json(test);
+    } catch (err) {
+        // If ID is invalid mongo ID, check if it was actually meant to be daily/:examId logic (backward compat if needed, but we used separate route)
+        console.error('Fetch Test Error:', err);
+        res.status(500).json({ error: 'Failed to fetch test' });
+    }
+});
+
 // POST /api/tests/submit
 // Submit a test attempt
 router.post('/submit', async (req, res) => {
@@ -91,6 +106,27 @@ router.post('/submit', async (req, res) => {
     } catch (err) {
         console.error('Submit Error:', err);
         res.status(500).json({ error: 'Submission Failed', details: err.message });
+    }
+});
+
+// POST /api/tests/generate
+// Generate an ad-hoc practice test
+router.post('/generate', async (req, res) => {
+    const { examId, topic, count } = req.body;
+
+    try {
+        const { createTest } = require('../utils/dailyTestGenerator');
+        const test = await createTest({
+            examId,
+            topic: topic || 'General',
+            type: 'practice',
+            count: count || 10
+        });
+
+        res.json({ testId: test._id, title: test.title, count: test.questions.length });
+    } catch (err) {
+        console.error('Generate Test Error:', err);
+        res.status(500).json({ error: 'Failed to generate test', details: err.message });
     }
 });
 

@@ -11,10 +11,14 @@ const dailyTestSchema = new mongoose.Schema({
 
     // Analytics for the test itself
     avgScore: { type: Number, default: 0 },
-    totalAttempts: { type: Number, default: 0 }
+    totalAttempts: { type: Number, default: 0 },
+
+    // Type of test
+    type: { type: String, enum: ['daily', 'practice'], default: 'daily' },
+    topic: { type: String, default: 'General' } // For subject-specific practice
 }, { timestamps: true });
 
-// Compound index to ensure one test per exam per day
-dailyTestSchema.index({ date: 1, examId: 1 }, { unique: true });
+// Compound index: Only enforce one 'daily' test per exam per day
+dailyTestSchema.index({ date: 1, examId: 1 }, { unique: true, partialFilterExpression: { type: 'daily' } });
 
 module.exports = mongoose.model('DailyTest', dailyTestSchema);
