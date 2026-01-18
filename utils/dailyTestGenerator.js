@@ -38,8 +38,12 @@ async function createTest({ examId, date, type = 'daily', topic = 'General', cou
 
     const questionIds = questions.map(q => q._id);
 
+    const dateStr = date || new Date().toISOString().split('T')[0];
+    // For practice tests, we need unique dates to avoid unique index collisions
+    const finalDate = type === 'practice' ? `${dateStr}_${Date.now()}` : dateStr;
+
     const newTest = new DailyTest({
-        date: date || new Date().toISOString().split('T')[0],
+        date: finalDate,
         examId,
         title: type === 'daily' ? `Daily Drill - ${date}` : `${topic} Practice`,
         questions: questionIds,
