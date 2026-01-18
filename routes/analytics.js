@@ -3,10 +3,13 @@ const router = express.Router();
 const User = require('../models/User');
 const TestAttempt = require('../models/TestAttempt');
 const { generateDashboardStats } = require('../utils/analysisEngine');
+const { verifyToken } = require('../utils/authMiddleware');
 
-// GET /api/analytics/dashboard?userId=...
-router.get('/dashboard', async (req, res) => {
-    const { userId } = req.query; // In real app, get from Auth Middleware (req.user.id)
+// GET /api/analytics/dashboard
+// Get user analytics (requires auth)
+router.get('/dashboard', verifyToken, async (req, res) => {
+    // Get userId from authenticated token, can also accept query param for backward compatibility
+    const userId = req.user?.id || req.query.userId;
 
     if (!userId) {
         return res.status(400).json({ error: 'User ID required' });

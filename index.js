@@ -36,8 +36,10 @@ app.use(compression()); // Compress responses (gzip)
 // Allow requests from Vercel Frontend
 const corsOptions = {
     origin: process.env.CLIENT_URL || '*', // Set CLIENT_URL in Render to your Vercel URL
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true, // Allow credentials (cookies, tokens)
+    optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
 app.use((req, res, next) => {

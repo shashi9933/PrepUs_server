@@ -4,10 +4,11 @@ const { getOrCreateDailyTest } = require('../utils/dailyTestGenerator');
 const { analyzeAttempt } = require('../utils/analysisEngine');
 const TestAttempt = require('../models/TestAttempt');
 const Question = require('../models/Question');
+const { verifyToken, optionalAuth } = require('../utils/authMiddleware');
 
 // GET /api/tests/daily/:examId
-// Get today's test for an exam
-router.get('/daily/:examId', async (req, res) => {
+// Get today's test for an exam (Optional auth - no need to be logged in to view questions)
+router.get('/daily/:examId', optionalAuth, async (req, res) => {
     const { examId } = req.params;
     const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
 
@@ -22,7 +23,7 @@ router.get('/daily/:examId', async (req, res) => {
 
 // GET /api/tests/:testId
 // Fetch a specific test by ID (for practice/generated tests)
-router.get('/:testId', async (req, res) => {
+router.get('/:testId', optionalAuth, async (req, res) => {
     try {
         const DailyTest = require('../models/DailyTest');
         const test = await DailyTest.findById(req.params.testId).populate('questions');
@@ -36,12 +37,15 @@ router.get('/:testId', async (req, res) => {
 });
 
 // POST /api/tests/submit
-// Submit a test attempt
-router.post('/submit', async (req, res) => {
+// Submit a test attempt (Required auth to track attempts)
+router.post('/submit', verifyToken, async (req, res) => {
     const { userId, testId, examId, responses, totalTimeTaken } = req.body;
     // responses: [{ questionId, selectedOption, timeTaken }]
 
     try {
+        // Use authenticated user ID if available, fallback to provided userId
+        const finalUserId = req.user?.id || userId;
+        
         // 1. Fetch full questions to check answers
         const questionIds = responses.map(r => r.questionId);
         const dbQuestions = await Question.find({ _id: { $in: questionIds } });
