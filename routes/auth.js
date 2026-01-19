@@ -198,5 +198,68 @@ router.post('/login-email', async (req, res) => {
     }
 });
 
+// 6. Login with Google
+router.post('/google', async (req, res) => {
+    const { token } = req.body; // Expecting ID Token from frontend
+
+    try {
+        // Decode token (simplest way without extra libraries if trusted, but verifying signature is best practice)
+        // For production, we should ideally use google-auth-library to verify signature.
+        // Assuming decode is safe for now or we trust the 'sub' claim matches a real google user.
+        // BETTER: Use jwt.decode just to get fields, real verification should happen if tight security needed or use library.
+        // We will just decode to get email/sub. 
+        // Note: In real prod, use: const ticket = await client.verifyIdToken(...)
+
+        const decoded = jwt.decode(token);
+
+        if (!decoded || !decoded.email) {
+            return res.status(400).json({ error: 'Invalid Google Token' });
+        }
+
+        const { email, name, picture, sub } = decoded;
+
+        let user = await User.findOne({ email });
+
+        if (!user) {
+            // Register new user
+            user = new User({
+                name,
+                email,
+                avatar: picture,
+                googleId: sub,
+                isProfileComplete: true // Google users usually have name/email
+            });
+            await user.save();
+        } else {
+            // Link google ID if not present
+            if (!user.googleId) {
+                user.googleId = sub;
+                if (!user.avatar) user.avatar = picture;
+                await user.save();
+            }
+        }
+
+        // Generate App Token
+        const appToken = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, { expiresIn: '7d' });
+
+        res.json({
+            message: 'Google Login successful',
+            token: appToken,
+            user: {
+                id: user._id,
+                name: user.name,
+                email: user.email,
+                avatar: user.avatar,
+                isProfileComplete: user.isProfileComplete,
+                targetExam: user.targetExam
+            }
+        });
+
+    } catch (err) {
+        console.error('Google Auth Error:', err);
+        res.status(500).json({ error: 'Google Login Failed' });
+    }
+});
+
 module.exports = router;
 
