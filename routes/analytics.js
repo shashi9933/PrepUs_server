@@ -42,7 +42,7 @@ router.get('/dashboard', verifyToken, async (req, res) => {
                     level: user.level
                 },
                 isNewUser: true,
-                message: "No test data available. specific"
+                message: "No test data available. Start practicing!"
             });
         }
 
@@ -60,16 +60,17 @@ router.get('/dashboard', verifyToken, async (req, res) => {
                 exam: user.targetExam || 'General',
                 status: stats.overall.readiness > 70 ? 'Exam Ready' : 'Needs Practice'
             },
-            trends: stats.trends,
-            subjects: stats.subjects,
-            mistakeProfile: stats.mistakes,
-            weakAreas: stats.weakAreas,
-            activityMap: stats.activity
+            trends: stats.trends || [],
+            subjects: stats.subjects || {},
+            mistakeProfile: stats.mistakes || {},
+            weakAreas: stats.weakAreas || [],
+            activityMap: stats.activity || {}
         });
 
     } catch (err) {
         console.error("Dashboard Analytics Error:", err);
-        res.status(500).json({ error: 'Failed to generate analytics' });
+        console.error("Stack:", err.stack);
+        res.status(500).json({ error: 'Failed to generate analytics', details: err.message });
     }
 });
 

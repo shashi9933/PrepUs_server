@@ -109,11 +109,30 @@ const generateDashboardStats = (history) => {
     const dailyActivity = {}; // Date -> count
 
     history.forEach(attempt => {
-        totalScore += attempt.score;
-        totalMaxScore += attempt.maxMarks;
+        if (!attempt) return; // Skip null/undefined attempts
+        
+        totalScore += attempt.score || 0;
+        totalMaxScore += attempt.maxMarks || 0;
 
         // Populate Daily Activity (for Heatmap)
-        const dateKey = new Date(attempt.completedAt).toISOString().split('T')[0];
+        // Use createdAt (from timestamps) or completedAt or fallback to now
+        const date = attempt.completedAt || attempt.createdAt || new Date();
+        
+        // Safely create date to avoid "Invalid time value" error
+        let dateKey;
+        try {
+            const dateObj = new Date(date);
+            if (isNaN(dateObj.getTime())) {
+                // Date is invalid, use today
+                dateKey = new Date().toISOString().split('T')[0];
+            } else {
+                dateKey = dateObj.toISOString().split('T')[0];
+            }
+        } catch (err) {
+            console.warn('Invalid date in attempt:', date, err.message);
+            dateKey = new Date().toISOString().split('T')[0]; // Use today if date is invalid
+        }
+        
         dailyActivity[dateKey] = (dailyActivity[dateKey] || 0) + 1;
 
         // Process Questions in Attempt
@@ -177,11 +196,23 @@ const generateDashboardStats = (history) => {
             accuracy: overallAccuracy.toFixed(1),
             readiness: readinessScore.toFixed(0)
         },
-        trends: history.slice(0, 10).map(h => ({ // Last 10 tests
-            date: new Date(h.completedAt).toLocaleDateString(),
-            score: h.score,
-            accuracy: h.accuracy
-        })).reverse(),
+        trends: history.slice(0, 10).map(h => {
+            // Handle date safely - use createdAt or completedAt
+            const date = h.completedAt || h.createdAt || new Date();
+            let dateStr;
+            try {
+                dateStr = new Date(date).toLocaleDateString();
+            } catch (err) {
+                console.warn('Invalid date in history:', date, err.message);
+                dateStr = new Date().toLocaleDateString();
+            }
+            
+            return {
+                date: dateStr,
+                score: h.score,
+                accuracy: h.accuracy
+            };
+        }).reverse(),
         subjects: subjectStats,
         weakAreas: weakTopics,
         mistakes: mistakeCounts,
