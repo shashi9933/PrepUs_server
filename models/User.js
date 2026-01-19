@@ -1,17 +1,27 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    name: { type: String, required: true },
+    name: { type: String },
     email: { type: String, sparse: true, unique: true }, // Sparse allows null/unique
     phone: { type: String, sparse: true, unique: true },
+    password: { type: String }, // For email/password auth
 
     // Auth Provider
-    provider: { type: String, enum: ['google', 'phone', 'email'], required: true },
+    provider: { type: String, enum: ['google', 'phone', 'email'], default: 'phone' },
     googleId: { type: String },
+
+    // OTP for phone auth
+    otp: { type: String },
+    otpExpires: { type: Date },
+
+    // Profile Completion
+    isProfileComplete: { type: Boolean, default: false },
+    avatar: { type: String },
 
     // Core Profile
     targetExam: { type: String }, // Primary exam goal
-    onboardingCompleted: { type: Boolean, default: false }, // Standardized flag
+    level: { type: Number, default: 1 },
+    exp: { type: Number, default: 0 },
 
     // Access Control
     role: { type: String, enum: ['user', 'admin', 'moderator'], default: 'user' },
