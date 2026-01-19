@@ -79,19 +79,6 @@ app.use('/api/auth', authRoutes);
 
 // Analytics Routes
 app.use('/api/analytics', analyticsRoutes);
-});
-
-app.get('/api/exams/:id', async (req, res) => {
-    try {
-        const exam = await Exam.findOne({ id: req.params.id }).lean();
-        if (!exam) return res.status(404).json({ message: 'Exam not found' });
-
-        // Cache individual exam for 1 hour
-        res.set('Cache-Control', 'public, max-age=3600');
-        res.json(exam);
-    } catch (err) {
-        console.error('Fetch Exam Detail Error:', err);
-        res.status(500).json({ error: 'Failed to fetch exam details' });
 
 // API: Get All Categories
 app.get('/api/categories', (req, res) => {
