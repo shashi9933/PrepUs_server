@@ -1,10 +1,29 @@
 const express = require('express');
 const router = express.Router();
-const { getOrCreateDailyTest } = require('../utils/dailyTestGenerator');
+const { getOrCreateDailyTest, createTest, createTestFromTemplate } = require('../utils/dailyTestGenerator');
 const { analyzeAttempt } = require('../utils/analysisEngine');
 const TestAttempt = require('../models/TestAttempt');
 const Question = require('../models/Question');
+const QuizTemplate = require('../models/QuizTemplate');
 const { verifyToken, optionalAuth } = require('../utils/authMiddleware');
+
+// GET /api/tests/templates
+// Fetch all available quiz templates
+router.get('/templates', optionalAuth, async (req, res) => {
+    try {
+        const { category } = req.query;
+        let query = {};
+        if (category && category !== 'All') {
+            query.examCategory = category.toLowerCase();
+        }
+
+        const templates = await QuizTemplate.find(query);
+        res.json(templates);
+    } catch (err) {
+        console.error('Fetch Templates Error:', err);
+        res.status(500).json({ error: 'Failed to fetch quiz templates' });
+    }
+});
 
 // GET /api/tests/daily/:examId
 // Get today's test for an exam (Optional auth - no need to be logged in to view questions)
@@ -26,7 +45,8 @@ router.get('/daily/:examId', optionalAuth, async (req, res) => {
 router.get('/:testId', optionalAuth, async (req, res) => {
     try {
         const DailyTest = require('../models/DailyTest');
-        const test = await DailyTest.findById(req.params.testId).populate('questions');
+        // Populate nested questionId
+        const test = await DailyTest.findById(req.params.testId).populate('questions.questionId');
         if (!test) return res.status(404).json({ error: 'Test not found' });
         res.json(test);
     } catch (err) {
@@ -43,8 +63,11 @@ router.post('/submit', verifyToken, async (req, res) => {
     // responses: [{ questionId, selectedOption, timeTaken }]
 
     try {
-        // Use authenticated user ID if available, fallback to provided userId
-        const finalUserId = req.user?.id || userId;
+        // Securely get ID from token
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+        const finalUserId = req.user.id;
 
         // 1. Fetch full questions to check answers
         const questionIds = responses.map(r => r.questionId);
@@ -81,9 +104,20 @@ router.post('/submit', verifyToken, async (req, res) => {
         const analysisResults = analyzeAttempt(analysisInput);
 
         // 4. Save to DB
+        // Fetch the test to determine its type and other metadata
+        const DailyTest = require('../models/DailyTest');
+        const testDoc = await DailyTest.findById(testId);
+
+        let testType = 'practice';
+        if (testDoc) {
+            testType = testDoc.type || 'practice';
+        }
+
         const newAttempt = new TestAttempt({
             userId, // Ensure userId is valid ObjectId if real user
             testId,
+            testType,
+            // ... other fields
             examId,
             score: analysisResults.summary.score,
             maxMarks: analysisResults.summary.maxMarks,
@@ -114,20 +148,38 @@ router.post('/submit', verifyToken, async (req, res) => {
 });
 
 // POST /api/tests/generate
-// Generate an ad-hoc practice test
+// Generate an ad-hoc practice test (supports templateId)
 router.post('/generate', async (req, res) => {
-    const { examId, topic, count } = req.body;
+    const { examId, topic, count, templateId } = req.body;
+
+    // Production Guard: Disable on-demand generation if flag is set
+    if (process.env.DISABLE_GENERATION === 'true') {
+        return res.status(403).json({
+            error: 'On-demand generation is disabled. Please use scheduled tests.',
+            code: 'GENERATION_DISABLED'
+        });
+    }
 
     try {
-        const { createTest } = require('../utils/dailyTestGenerator');
-        const test = await createTest({
-            examId,
-            topic: topic || 'General',
-            type: 'practice',
-            count: count || 10
-        });
+        let test;
+        if (templateId) {
+            test = await createTestFromTemplate(templateId);
+        } else {
+            // Legacy/Fallback ad-hoc generation
+            test = await createTest({
+                examId,
+                topic: topic || 'General',
+                type: 'practice',
+                count: count || 10
+            });
+        }
 
-        res.json({ testId: test._id, title: test.title, count: test.questions.length });
+        res.json({
+            testId: test._id,
+            title: test.title,
+            count: test.questions.length,
+            testType: test.type
+        });
     } catch (err) {
         console.error('Generate Test Error:', err);
         const statusCode = err.message.includes('No questions found') ? 404 : 500;

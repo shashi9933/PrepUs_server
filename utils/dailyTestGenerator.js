@@ -1,4 +1,5 @@
 const DailyTest = require('../models/DailyTest');
+const QuizTemplate = require('../models/QuizTemplate');
 const Question = require('../models/Question');
 const { getRandomQuestions } = require('./examDatabaseManager');
 
@@ -38,27 +39,31 @@ async function createTest({ examId, date, type = 'daily', topic = 'General', cou
 
         const questionIds = questions.map(q => q._id);
 
-        const dateStr = date || new Date().toISOString().split('T')[0];
-        
-        // For practice tests, always use unique timestamp to avoid collisions
-        // For daily tests, use the date as-is (unique index enforces one per day per exam)
-        let finalDate = dateStr;
-        if (type === 'practice') {
-            finalDate = `${dateStr}_${Date.now()}_${Math.random()}`;
+        let finalDate = new Date();
+        // If specific date provided (e.g. for daily test backfill), parse it
+        if (date) {
+            finalDate = new Date(date);
+        } else if (type === 'daily') {
+            // For daily tests, normalize to today's date (local midnight or UTC midnight depending on policy)
+            // Simpler: Just use the provided date string YYYY-MM-DD and let Mongo cast to start of day
+            const todayStr = new Date().toISOString().split('T')[0];
+            finalDate = new Date(todayStr);
         }
 
         const newTest = new DailyTest({
             date: finalDate,
             examId,
-            title: type === 'daily' ? `Daily Drill - ${date}` : `${topic} Practice`,
+            title: type === 'daily' ? `Daily Drill - ${date || new Date().toISOString().split('T')[0]}` : `${topic} Practice`,
             questions: questionIds,
             isPublished: true,
             type,
-            topic
+            topic,
+            duration: count * 60, // Default 1 min per question
+            maxMarks: count * 1   // Default 1 mark per question
         });
 
         await newTest.save();
-        const populatedTest = await DailyTest.findById(newTest._id).populate('questions');
+        const populatedTest = await DailyTest.findById(newTest._id).populate('questions.questionId');
         console.log(`   ✅ Test created successfully with ${populatedTest.questions.length} questions`);
         return populatedTest;
     } catch (err) {
@@ -68,22 +73,89 @@ async function createTest({ examId, date, type = 'daily', topic = 'General', cou
 }
 
 /**
+ * Creates a practice test from a predefined template
+ */
+async function createTestFromTemplate(templateId) {
+    try {
+        const template = await QuizTemplate.findById(templateId);
+        if (!template) throw new Error('Template not found');
+
+        console.log(`⚡ Generating test from template: ${template.title}`);
+
+        // Construct query criteria
+        // If template has specific examId, use it. Otherwise rely on category.
+        // Note: examDatabaseManager might need adjustment if it strictly requires 'examId'.
+        // For now, assuming examCategory maps to an examId concept or we pick a default for that category.
+
+        let targetExamId = template.examId;
+        if (!targetExamId) {
+            // Map category to a default examId for question fetching if needed
+            // OR we assume questions are tagged by 'exam' which is actually the category in some datasets
+            // Let's assume for now we search by the category as the examId for broad categories
+            targetExamId = template.examCategory;
+        }
+
+        const questions = await getRandomQuestions({
+            examId: targetExamId, // This might need to match your Question schema 'exam' field
+            topic: template.topic,
+            count: template.questionCount
+        });
+
+        if (questions.length === 0) {
+            throw new Error(`No questions found for template criteria: ${template.examCategory} - ${template.topic}`);
+        }
+
+        const newTest = new DailyTest({
+            date: new Date(),
+            examId: targetExamId,
+            title: template.title,
+            questions: questions.map((q, idx) => ({
+                questionId: q._id,
+                order: idx + 1
+            })),
+            isPublished: true,
+            type: 'practice',
+            topic: template.topic,
+            duration: template.duration * 60, // Template duration is in mins
+            maxMarks: template.questionCount * 1 // Default marks
+        });
+
+        await newTest.save();
+        return await DailyTest.findById(newTest._id).populate('questions.questionId');
+
+    } catch (err) {
+        console.error("Template Gen Error:", err);
+        throw err;
+    }
+}
+
+/**
  * Generates or retrieves the Daily Test for a specific Exam.
  * FETCHES FROM DATABASE if exists, only generates once per day.
  * Uses MongoDB upsert to handle race conditions safely.
  */
+const { getISTDateString } = require('./dateUtils');
+
+// ...
+
 async function getOrCreateDailyTest(examId, date) {
     try {
-        const dateStr = date || new Date().toISOString().split('T')[0];
-        
+        const dateStr = date || getISTDateString();
+        // Normalize to midnight for consistent finding
+        const checkDate = new Date(dateStr);
+
         console.log(`📝 Loading daily test for ${examId} on ${dateStr}...`);
 
         // Step 1: Check if test already exists (FETCH FROM DB)
-        // Note: We don't filter by type since all our daily tests should be type 'daily'
+        // Find using a date range to be safe against time components
+        const startOfDay = new Date(dateStr); startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(dateStr); endOfDay.setHours(23, 59, 59, 999);
+
         const existingTest = await DailyTest.findOne({
             examId,
-            date: dateStr
-        }).populate('questions');
+            type: 'daily',
+            date: { $gte: startOfDay, $lte: endOfDay }
+        }).populate('questions.questionId');
 
         if (existingTest && existingTest.questions && existingTest.questions.length > 0) {
             console.log(`✅ Daily test already exists (fetched from DB) - ${existingTest.questions.length} questions`);
@@ -92,9 +164,9 @@ async function getOrCreateDailyTest(examId, date) {
 
         // Step 2: If not exists, generate it (only once per day)
         console.log(`⏳ Test doesn't exist. Generating questions...`);
-        
+
         const totalQuestions = await Question.countDocuments({ exam: examId });
-        
+
         if (totalQuestions === 0) {
             throw new Error(`No questions found for exam: ${examId}`);
         }
@@ -109,23 +181,28 @@ async function getOrCreateDailyTest(examId, date) {
             throw new Error(`Failed to select questions for exam: ${examId}`);
         }
 
-        const questionIds = questions.map(q => q._id);
+        const questionsWithOrder = questions.map((q, index) => ({
+            questionId: q._id,
+            order: index + 1
+        }));
         console.log(`   ✅ Selected ${questions.length} random questions`);
 
         // Step 3: Save to database
         const newTest = new DailyTest({
             examId,
-            date: dateStr,
+            date: checkDate,
             type: 'daily',
             topic: 'General',
             title: `Daily Drill - ${dateStr}`,
-            questions: questionIds,
-            isPublished: true
+            questions: questionsWithOrder,
+            isPublished: true,
+            duration: 600, // 10 mins
+            maxMarks: 10
         });
 
         await newTest.save();
-        const populatedTest = await DailyTest.findById(newTest._id).populate('questions');
-        
+        const populatedTest = await DailyTest.findById(newTest._id).populate('questions.questionId');
+
         console.log(`✅ Daily test GENERATED & SAVED to DB - ${populatedTest.questions.length} questions`);
         return populatedTest;
 
@@ -136,4 +213,4 @@ async function getOrCreateDailyTest(examId, date) {
 }
 
 
-module.exports = { getOrCreateDailyTest, createTest };
+module.exports = { getOrCreateDailyTest, createTest, createTestFromTemplate };

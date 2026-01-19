@@ -1,32 +1,33 @@
 const mongoose = require('mongoose');
 
 const userSchema = new mongoose.Schema({
-    name: { type: String }, // Optional initially
-    email: { type: String, unique: true, sparse: true }, // Sparse: Allows specific null/duplicates if needed, but uniqueness matters for non-null
-    phone: { type: String, unique: true, sparse: true }, // Main identifier for OTP
-    password: { type: String },
-    googleId: String,
+    name: { type: String, required: true },
+    email: { type: String, sparse: true, unique: true }, // Sparse allows null/unique
+    phone: { type: String, sparse: true, unique: true },
 
-    // Auth specific
-    otp: { type: String },
-    otpExpires: { type: Date },
-    isProfileComplete: { type: Boolean, default: false },
+    // Auth Provider
+    provider: { type: String, enum: ['google', 'phone', 'email'], required: true },
+    googleId: { type: String },
 
-    avatar: String,
+    // Core Profile
+    targetExam: { type: String }, // Primary exam goal
+    onboardingCompleted: { type: Boolean, default: false }, // Standardized flag
 
-    // Progress & Gameification
+    // Access Control
+    role: { type: String, enum: ['user', 'admin', 'moderator'], default: 'user' },
+    isPremium: { type: Boolean, default: false },
+
+    // Gamification
+    xp: { type: Number, default: 0 },
     streak: { type: Number, default: 0 },
-    lastActive: { type: Date, default: Date.now },
-    totalQuestionsSolved: { type: Number, default: 0 },
-    exp: { type: Number, default: 0 },
-    level: { type: Number, default: 1 },
+    lastActive: { type: Date },
 
-    // Preferences
-    targetExam: { type: String }, // e.g., 'sbi-po'
-
-    // Performance History (Summary)
-    recentScores: [{ type: Number }], // Last 10 scores
-    overallAccuracy: { type: Number, default: 0 }
+    // User Preferences
+    preferences: {
+        language: { type: String, default: 'en' },
+        difficulty: { type: String, enum: ['Easy', 'Medium', 'Hard'], default: 'Medium' },
+        reminders: { type: Boolean, default: true }
+    }
 
 }, { timestamps: true });
 
