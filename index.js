@@ -8,6 +8,9 @@ const Exam = require('./models/Exam');
 const categories = require('./data/categories');
 const adminRoutes = require('./routes/admin');
 const testRoutes = require('./routes/tests');
+const examRoutes = require('./routes/exams');
+const authRoutes = require('./routes/auth');
+const analyticsRoutes = require('./routes/analytics');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -67,37 +70,15 @@ app.use('/api/admin', adminRoutes);
 
 // Test Routes
 app.use('/api/tests', testRoutes);
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/analytics', require('./routes/analytics'));
 
+// Exam Routes (NEW - Includes syllabus endpoint)
+app.use('/api/exams', examRoutes);
 
-// API Routes
-app.get('/api/exams', async (req, res) => {
-    // Implement Caching Headers (Cache for 10 minutes)
-    try {
-        const { category, q } = req.query;
-        let query = {};
+// Auth Routes
+app.use('/api/auth', authRoutes);
 
-        if (category && category !== 'all') {
-            query.category = category;
-        }
-
-        if (q) {
-            query.$or = [
-                { title: { $regex: q, $options: 'i' } },
-                { subtitle: { $regex: q, $options: 'i' } }
-            ];
-        }
-
-        const exams = await Exam.find(query).lean();
-
-        // Cache for 10 minutes
-        res.set('Cache-Control', 'public, max-age=600');
-        res.json(exams);
-    } catch (err) {
-        console.error('Fetch Exams Error:', err);
-        res.status(500).json({ error: 'Failed to fetch exams' });
-    }
+// Analytics Routes
+app.use('/api/analytics', analyticsRoutes);
 });
 
 app.get('/api/exams/:id', async (req, res) => {
@@ -111,8 +92,6 @@ app.get('/api/exams/:id', async (req, res) => {
     } catch (err) {
         console.error('Fetch Exam Detail Error:', err);
         res.status(500).json({ error: 'Failed to fetch exam details' });
-    }
-});
 
 // API: Get All Categories
 app.get('/api/categories', (req, res) => {

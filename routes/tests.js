@@ -157,11 +157,18 @@ router.post('/submit', verifyToken, async (req, res) => {
 });
 
 // POST /api/tests/generate
-// Generate an ad-hoc practice test (supports templateId)
+// Generate practice test from DATABASE ONLY (NO AI)
+// This endpoint MUST only sample from existing questions
 router.post('/generate', async (req, res) => {
-    const { examId, topic, count, templateId } = req.body;
+    const { examId, topic, count, templateId, type = 'practice' } = req.body;
 
-    console.log('🎯 Generate Test Request:', { examId, topic, count, templateId });
+    console.log('🎯 Generate Test Request:', { examId, topic, count, templateId, type });
+
+    // ✅ CRITICAL: Disable AI generation for practice mode
+    // Always use database sampling ONLY
+    if (type === 'practice' && !process.env.ALLOW_AI_GENERATION) {
+        console.log('✅ Practice mode: Using database questions only');
+    }
 
     // Production Guard: Disable on-demand generation if flag is set
     if (process.env.DISABLE_GENERATION === 'true') {
@@ -177,23 +184,33 @@ router.post('/generate', async (req, res) => {
             console.log(`📝 Creating test from template: ${templateId}`);
             test = await createTestFromTemplate(templateId);
         } else {
-            // Legacy/Fallback ad-hoc generation
-            console.log(`📝 Creating ad-hoc test for exam: ${examId}`);
+            // Ensure we ONLY create from database questions
+            console.log(`📝 Creating practice test for exam: ${examId}, topic: ${topic}`);
             test = await createTest({
                 examId,
                 topic: topic || 'General',
                 type: 'practice',
-                count: count || 10
+                count: count || 15,
+                dbOnly: true // Force database-only sampling
             });
         }
 
-        console.log(`✅ Test created successfully:`, { testId: test._id, questionsCount: test.questions.length });
+        if (!test || !test.questions || test.questions.length === 0) {
+            throw new Error(`No questions found in database for exam: ${examId}, topic: ${topic}`);
+        }
+
+        console.log(`✅ Test created successfully:`, { 
+            testId: test._id, 
+            questionsCount: test.questions.length,
+            source: 'database'
+        });
         
         res.json({
             testId: test._id,
             title: test.title,
             count: test.questions.length,
-            testType: test.type
+            testType: test.type,
+            source: 'database'
         });
     } catch (err) {
         console.error('❌ Generate Test Error:', err);

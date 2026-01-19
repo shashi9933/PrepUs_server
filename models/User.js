@@ -19,7 +19,8 @@ const userSchema = new mongoose.Schema({
     avatar: { type: String },
 
     // Core Profile
-    targetExam: { type: String }, // Primary exam goal
+    targetExam: { type: String }, // (DEPRECATED) - Use targetExams instead
+    targetExams: [{ type: String }], // New: Multiple exam support (e.g., ["sbi-po", "upsc-cse"])
     level: { type: Number, default: 1 },
     exp: { type: Number, default: 0 },
 

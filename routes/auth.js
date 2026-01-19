@@ -79,8 +79,9 @@ router.post('/verify-otp', async (req, res) => {
 });
 
 // 3. Update Profile (Onboarding)
+// Supports both single exam (targetExam) and multiple exams (targetExams)
 router.post('/update-profile', async (req, res) => {
-    const { userId, name, email, targetExam } = req.body;
+    const { userId, name, email, targetExam, targetExams } = req.body;
 
     try {
         const user = await User.findById(userId);
@@ -88,7 +89,16 @@ router.post('/update-profile', async (req, res) => {
 
         if (name) user.name = name;
         if (email) user.email = email;
-        if (targetExam) user.targetExam = targetExam;
+        
+        // ✅ NEW: Support multiple exams
+        if (targetExams && Array.isArray(targetExams) && targetExams.length > 0) {
+            user.targetExams = targetExams; // e.g., ["sbi-po", "upsc-cse"]
+            console.log(`📚 Updated targetExams for user:`, targetExams);
+        } else if (targetExam) {
+            // Fallback: support single exam
+            user.targetExams = [targetExam]; // Convert to array
+            console.log(`📚 Updated targetExam for user:`, targetExam);
+        }
 
         user.isProfileComplete = true;
         await user.save();
@@ -99,7 +109,8 @@ router.post('/update-profile', async (req, res) => {
                 id: user._id,
                 phone: user.phone,
                 name: user.name,
-                targetExam: user.targetExam,
+                targetExam: user.targetExams?.[0] || null, // Primary exam
+                targetExams: user.targetExams || [], // All exams
                 isProfileComplete: true
             }
         });
@@ -258,6 +269,44 @@ router.post('/google', async (req, res) => {
     } catch (err) {
         console.error('Google Auth Error:', err);
         res.status(500).json({ error: 'Google Login Failed' });
+    }
+});
+
+// GET /api/auth/me
+// Get current user profile (requires authentication)
+const { verifyToken } = require('../utils/authMiddleware');
+
+router.get('/me', verifyToken, async (req, res) => {
+    try {
+        if (!req.user || !req.user.id) {
+            return res.status(401).json({ error: 'Unauthorized' });
+        }
+
+        const user = await User.findById(req.user.id).select(
+            'name email phone avatar isProfileComplete targetExam targetExams level exp xp streak'
+        );
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        res.json({
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            phone: user.phone,
+            avatar: user.avatar,
+            isProfileComplete: user.isProfileComplete,
+            targetExam: user.targetExams?.[0] || user.targetExam || null, // Primary exam
+            targetExams: user.targetExams || [], // All exams
+            level: user.level,
+            exp: user.exp,
+            xp: user.xp,
+            streak: user.streak
+        });
+    } catch (err) {
+        console.error('Get User Error:', err);
+        res.status(500).json({ error: 'Failed to fetch user profile' });
     }
 });
 
