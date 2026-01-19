@@ -17,7 +17,9 @@ router.get('/templates', optionalAuth, async (req, res) => {
             query.examCategory = category.toLowerCase();
         }
 
+        console.log(`📋 Fetching templates with query:`, query);
         const templates = await QuizTemplate.find(query);
+        console.log(`✅ Found ${templates.length} templates`);
         res.json(templates);
     } catch (err) {
         console.error('Fetch Templates Error:', err);
@@ -45,14 +47,21 @@ router.get('/daily/:examId', optionalAuth, async (req, res) => {
 router.get('/:testId', optionalAuth, async (req, res) => {
     try {
         const DailyTest = require('../models/DailyTest');
+        console.log(`📖 Fetching test: ${req.params.testId}`);
+        
         // Populate nested questionId
         const test = await DailyTest.findById(req.params.testId).populate('questions.questionId');
-        if (!test) return res.status(404).json({ error: 'Test not found' });
+        if (!test) {
+            console.error(`❌ Test not found: ${req.params.testId}`);
+            return res.status(404).json({ error: 'Test not found' });
+        }
+        
+        console.log(`✅ Test fetched: ${test.title} with ${test.questions.length} questions`);
         res.json(test);
     } catch (err) {
         // If ID is invalid mongo ID, check if it was actually meant to be daily/:examId logic (backward compat if needed, but we used separate route)
-        console.error('Fetch Test Error:', err);
-        res.status(500).json({ error: 'Failed to fetch test' });
+        console.error('❌ Fetch Test Error:', err);
+        res.status(500).json({ error: 'Failed to fetch test', details: err.message });
     }
 });
 
@@ -152,6 +161,8 @@ router.post('/submit', verifyToken, async (req, res) => {
 router.post('/generate', async (req, res) => {
     const { examId, topic, count, templateId } = req.body;
 
+    console.log('🎯 Generate Test Request:', { examId, topic, count, templateId });
+
     // Production Guard: Disable on-demand generation if flag is set
     if (process.env.DISABLE_GENERATION === 'true') {
         return res.status(403).json({
@@ -163,9 +174,11 @@ router.post('/generate', async (req, res) => {
     try {
         let test;
         if (templateId) {
+            console.log(`📝 Creating test from template: ${templateId}`);
             test = await createTestFromTemplate(templateId);
         } else {
             // Legacy/Fallback ad-hoc generation
+            console.log(`📝 Creating ad-hoc test for exam: ${examId}`);
             test = await createTest({
                 examId,
                 topic: topic || 'General',
@@ -174,6 +187,8 @@ router.post('/generate', async (req, res) => {
             });
         }
 
+        console.log(`✅ Test created successfully:`, { testId: test._id, questionsCount: test.questions.length });
+        
         res.json({
             testId: test._id,
             title: test.title,
@@ -181,7 +196,7 @@ router.post('/generate', async (req, res) => {
             testType: test.type
         });
     } catch (err) {
-        console.error('Generate Test Error:', err);
+        console.error('❌ Generate Test Error:', err);
         const statusCode = err.message.includes('No questions found') ? 404 : 500;
         res.status(statusCode).json({
             error: 'Failed to generate test',
